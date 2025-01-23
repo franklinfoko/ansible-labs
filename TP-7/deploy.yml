@@ -3,6 +3,8 @@
   become: true
   environment:
     PYTHONPATH: "/home/vagrant/.local/lib/python3.8/site-packages"
+  vars_files:
+    - files/secrets/credentials.yml
   pre_tasks:
     - name: Install tools on Ubuntu
       apt:
