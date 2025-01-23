@@ -1,0 +1,37 @@
+- name: Create apache with docker
+  hosts: all
+  become: true
+  environment:
+    PYTHONPATH: "/home/vagrant/.local/lib/python3.8/site-packages"
+  pre_tasks:
+    - name: Install tools on Ubuntu
+      apt:
+        name: '{{ item }}'
+        state: present
+      when: ansible_distribution == "Ubuntu"
+      loop:
+        - git
+        - wget
+    - name: Install tools on CentOS
+      yum:
+        name: '{{ item }}'
+        state: present
+      when: ansible_distribution == "CentOS"
+      loop:
+        - git
+        - wget
+  tasks:
+    - name: Copy Site Web
+      template:
+        src: templates/index.html.j2
+        dest: /home/vagrant/index.html      
+    - name: Install apache2
+      community.docker.docker_container:
+        name: myapache
+        image: httpd
+        state: started
+        ports:
+          - "80:80"
+        volumes:
+          - /home/vagrant/index.html:/usr/local/apache2/htdocs/index.html
+ 
